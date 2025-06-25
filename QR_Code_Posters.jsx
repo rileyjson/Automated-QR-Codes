@@ -1,5 +1,3 @@
-
-
 var document = app.activeDocument; //this grabs the current document you have open (you want this to to be the poster template)
 var link = document.links; //Selects the link (QR code) that the template currently has
 var QRCodeLink = link[0]; //there will only ever be one link (the QR code on the template)
@@ -11,19 +9,39 @@ var printPreset = app.pdfExportPresets.itemByName("[High Quality Print]"); //ens
 var exportFolder = new Folder(Folder.desktop + "/" + "Completed Posters"); //create folder to save posters into
 
 if (!exportFolder.exists) {
-    exportFolder.create();
+  exportFolder.create();
 }
 
-for (var i=0; i<QRCodes.length; i++) { 
-    //loop through each QR code in folder, 
-    //add it to indesign template, and export it to desktop
-    var decode = decodeURI(QRCodes[i].relativeURI);
-    var file = File(decode)
-    link[0].relink(file); //update template link with link of each QR code in your folder of them
-    link[0].update();
-    var exportedPoster = new File(exportFolder.fsName + "/2025_" + link[0].name + "_Home Delivery Poster.pdf");
-    document.exportFile(ExportFormat.PDF_TYPE, exportedPoster, false, printPreset);
-
+for (var i = 0; i < QRCodes.length; i++) {
+  //loop through each QR code in folder,
+  //add it to indesign template, and export it to desktop
+  var decode = decodeURI(QRCodes[i].relativeURI);
+  var file = File(decode);
+  link[0].relink(file); //update template link with link of each QR code in your folder of them
+  link[0].update();
+  var cleanedFileName = splitName();
+  var exportedPoster = new File(
+    exportFolder.fsName +
+      "/2025_" +
+      cleanedFileName +
+      "_Home Delivery Poster.pdf"
+  );
+  document.exportFile(
+    ExportFormat.PDF_TYPE,
+    exportedPoster,
+    false,
+    printPreset
+  );
 }
 
-alert("Posters are finished and saved to your desktop in the folder 'Completed Posters'.")
+function splitName() {
+  var parts = link[0].name.split("."); //gets rid of the extension to the file name (i.e. .svg).
+  parts.pop();
+  var shortenedName = parts.join(".");
+
+  return shortenedName;
+}
+
+alert(
+  "Posters are finished and saved to your desktop in the folder 'Completed Posters'."
+);
